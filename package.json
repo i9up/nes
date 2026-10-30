@@ -1,0 +1,40 @@
+{
+  "name": "@i9up/nes",
+  "version": "0.1.0",
+  "description": "Método NES (A Nova Engenharia de Software) aplicado ao repositório: time de agentes com contrato, maturidade M0–M5 com critérios objetivos e OpenSpec/Ponytail no fluxo.",
+  "type": "module",
+  "bin": {
+    "nes": "bin/nes.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "modelos",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test",
+    "test:cobertura": "node --test --experimental-test-coverage"
+  },
+  "dependencies": {
+    "@i9up/fengshui": "0.1.0"
+  },
+  "keywords": [
+    "nes",
+    "agents",
+    "claude",
+    "cursor",
+    "codex",
+    "openspec",
+    "ponytail",
+    "maturity"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/i9up/nes.git"
+  },
+  "license": "MIT"
+}
