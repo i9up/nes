@@ -1,12 +1,15 @@
 // Os 5 papéis do time NES (o catálogo de 8 papéis do livro consolidado em 5) e como adotar agentes que já existem.
 
+// `adotar`: padrões em ordem de prioridade; o primeiro que acha algum agente decide (qa-specialist antes de *-review).
 export const PAPEIS = [
-  { id: 'maestro', nome: 'Maestro', desde: 'M2', adotar: /project-?manager|orquestr|orchestr|maestro|coordenad/i },
-  { id: 'executor', nome: 'Executor', desde: 'M2', adotar: /specialist|especialista|executor|developer|desenvolvedor|fullstack/i },
-  { id: 'crivo', nome: 'Crivo', desde: 'M2', adotar: /\bqa\b|qa-|crivo|review|revis/i },
-  { id: 'arquiteto', nome: 'Arquiteto', desde: 'M3', adotar: /architect|arquitet/i },
-  { id: 'cronista', nome: 'Cronista', desde: 'M4', adotar: /cronista|documenta|knowledge|curator|scribe/i },
+  { id: 'maestro', nome: 'Maestro', desde: 'M2', adotar: [/maestro|orquestr|orchestr/i, /project-?manager|coordenad/i] },
+  { id: 'executor', nome: 'Executor', desde: 'M2', adotar: [/specialist|especialista|executor|developer|desenvolvedor|fullstack/i] },
+  { id: 'crivo', nome: 'Crivo', desde: 'M2', adotar: [/crivo|\bqa\b|qa-/i, /review|revis/i] },
+  { id: 'arquiteto', nome: 'Arquiteto', desde: 'M3', adotar: [/arquitet|architect/i] },
+  { id: 'cronista', nome: 'Cronista', desde: 'M4', adotar: [/cronista|scribe/i, /documenta|knowledge|curator/i] },
 ];
+
+export const casaComPapel = (papel, agente) => papel.adotar.some((r) => r.test(`${agente.nome} ${agente.descricao}`));
 
 export const NIVEIS_ALVO = ['M2', 'M3', 'M4'];
 
@@ -25,8 +28,10 @@ export function adotar(agentes, papeis) {
   const usados = new Set();
   // O Executor aceita qualquer especialista, então escolhe por último (senão o qa-specialist viraria Executor).
   for (const papel of [...papeis].sort((a, b) => (a.id === 'executor') - (b.id === 'executor'))) {
-    const candidatos = agentes.filter((a) => !a.gerado && !usados.has(a.nome) && papel.adotar.test(`${a.nome} ${a.descricao}`));
-    if (!candidatos.length) continue;
+    const livres = agentes.filter((a) => !a.gerado && !usados.has(a.nome));
+    const padrao = papel.adotar.find((r) => livres.some((a) => r.test(`${a.nome} ${a.descricao}`)));
+    if (!padrao) continue;
+    const candidatos = livres.filter((a) => padrao.test(`${a.nome} ${a.descricao}`));
     const escolhidos = papel.id === 'executor' ? candidatos : [candidatos[0]];
     escolhidos.forEach((a) => usados.add(a.nome));
     mapa[papel.id] = escolhidos.map((a) => a.nome);

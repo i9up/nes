@@ -1,11 +1,19 @@
 import path from 'node:path';
 import { contrato, modeloDeContrato } from './comando-contrato.js';
 import { maturidade } from './comando-maturidade.js';
+import { init } from './init.js';
+import { sistemaReal } from './sistema.js';
 
 export const AJUDA = `NES · A Nova Engenharia de Software aplicada ao repositório
 
 Uso: nes <comando> [opções]   (ou: npx @i9up/nes <comando>)
 
+  init                        monta o time NES: 4 perguntas, adota os agentes que já existem, põe OpenSpec e
+                              Ponytail no fluxo e configura o gate do Crivo. Mostra o plano; nunca sobrescreve.
+                                --sim             usa os padrões, sem perguntar (não instala nada)
+                                --com harness     inclui o harness-toolkit no fluxo
+                                --sem openspec,ponytail   deixa ferramentas de fora
+                                --refazer         refaz a entrevista mesmo com nes.json
   contrato [agente|arquivo]   confere as 5 seções do contrato de cada agente (cap. 8)
                                 --modelo <nome>   cria .claude/agents/<nome>.md com as 5 seções em branco
                                 --json            saída em JSON
@@ -30,7 +38,7 @@ export function posicional(args, comValor = []) {
   return '';
 }
 
-export async function executar(args, { cwd = process.cwd(), perguntar = null } = {}) {
+export async function executar(args, { cwd = process.cwd(), perguntar = null, sis = sistemaReal } = {}) {
   const comando = args[0] ?? 'ajuda';
   const raiz = path.resolve(cwd, opcao(args, '--pasta', '.'));
   switch (comando) {
@@ -40,6 +48,14 @@ export async function executar(args, { cwd = process.cwd(), perguntar = null } =
       const r = contrato(raiz, { alvo: posicional(args, ['--pasta', '--modelo']), json: args.includes('--json') });
       return { texto: r.texto, codigo: r.codigo || (args.includes('--estrito') && r.completos < r.total ? 1 : 0) };
     }
+    case 'init':
+      return init(raiz, sis, {
+        perguntar,
+        sim: args.includes('--sim'),
+        refazer: args.includes('--refazer'),
+        com: opcao(args, '--com').split(',').filter(Boolean),
+        sem: opcao(args, '--sem').split(',').filter(Boolean),
+      });
     case 'maturidade':
       return maturidade(raiz, { json: args.includes('--json'), perguntar: args.includes('--sem-perguntas') ? null : perguntar });
     case 'ajuda':

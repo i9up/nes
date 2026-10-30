@@ -1,0 +1,7 @@
+---
+description: Time NES e fluxo de entrega. Use ao implementar, revisar ou registrar uma mudança.
+alwaysApply: false
+---
+
+Siga a seção "Time NES" do `AGENTS.md` e o contrato de cada papel em `.claude/agents/nes-*.md` (ou do agente adotado
+para o papel, listado em `nes.json`). O método está em `docs/nes/METODOLOGIA.md`.

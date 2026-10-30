@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { encontrarApps, lerConfig } from '@i9up/fengshui/src/medir.js';
 import { completo } from './contrato.js';
-import { PAPEIS } from './papeis.js';
+import { PAPEIS, casaComPapel } from './papeis.js';
 
 export const NOMES = { M0: 'Sem IA', M1: 'Assistentes', M2: 'Agentes Especializados', M3: 'Times de Agentes', M4: 'Software Factory Inteligente', M5: 'Organização Cognitiva' };
 
@@ -38,7 +38,7 @@ export function trimestresDoCapital(raiz) {
   return trimestres.size;
 }
 
-const ehMaestro = (a) => a.nome === 'nes-maestro' || PAPEIS[0].adotar.test(`${a.nome} ${a.descricao}`);
+const ehMaestro = (a) => a.nome === 'nes-maestro' || casaComPapel(PAPEIS[0], a);
 
 /** Critérios de cada transição. estado: 'ok' (verificado), 'declarado' ou 'falta'. */
 export function criterios(raiz, { agentes, config = {}, declarado = {} }) {
