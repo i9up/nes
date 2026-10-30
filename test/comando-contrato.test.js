@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { contrato, modeloDeContrato } from '../src/comando-contrato.js';
 import { lerAgentes, avaliarArquivo } from '../src/agentes.js';
-import { executar, posicional, opcao, AJUDA } from '../src/cli.js';
+import { executar, posicional, opcao } from '../src/cli.js';
 import { projeto, ler, existe, AGENTE_COMPLETO } from './ajuda.js';
 import path from 'node:path';
 
@@ -68,9 +68,9 @@ test('modeloDeContrato: cria o esqueleto, recusa nome inválido e nunca sobrescr
 test('cli: opcao, posicional, ajuda, desconhecido, contrato, --modelo, --estrito e --pasta', async () => {
   assert.equal(opcao(['x', '--pasta', 'p'], '--pasta'), 'p');
   assert.equal(opcao(['x', '--pasta', '--json'], '--pasta', 'd'), 'd');
-  assert.equal(posicional(['contrato', '--pasta', 'p', '--json', 'alvo'], ['--pasta']), 'alvo');
+  assert.equal(posicional(['contrato', '--pasta', 'p', '--json', 'alvo']), 'alvo');
   assert.equal(posicional(['contrato']), '');
-  assert.equal((await executar([])).texto, AJUDA);
+  assert.match((await executar([])).texto, /^NES · A Nova Engenharia/);
   assert.equal((await executar(['-h'])).codigo, 0);
   assert.equal((await executar(['--help'])).codigo, 0);
   assert.equal((await executar(['xyz'])).codigo, 1);

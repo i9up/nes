@@ -1,0 +1,25 @@
+NES · The New Software Engineering, applied to your repository
+
+Usage: nes <command> [options]   (or: npx @i9up/nes <command>)
+
+  init                        builds the NES team: 4 questions, adopts the agents you already have, puts OpenSpec
+                              and Ponytail in the flow and sets up the Crivo gate. Shows the plan; never overwrites.
+                                --yes             uses the defaults without asking (installs nothing)
+                                --with harness    adds harness-toolkit to the flow
+                                --without openspec,ponytail   leaves tools out
+                                --redo            asks the interview again even with nes.json
+                              Agent mode (no terminal; an LLM drives it):
+                                --description "..." --approver "..." [--level M3] [--stack "..."] [--test "folder=command"]
+                                --apply           writes the files (without it, only shows the plan)
+  contract [agent|file]       checks the 5 sections of each agent's contract (ch. 8)
+                                --template <name> creates .claude/agents/<name>.md with the 5 sections blank
+                                --json            JSON output
+                                --strict          exits with code 1 if any contract is incomplete (CI)
+  maturity                    M0–M5 level of the project and of each area, with the next criterion to meet (ch. 21)
+                                --declare key="evidence"   records what only the team knows (agent mode)
+                                --no-questions    does not ask; lists what is left to declare
+                                --json            JSON output
+  agent                       protocol for an LLM (Claude Code, Codex, Cursor) to drive NES in the project
+
+Common options: --dir <folder> (default: current folder) · --lang en|pt
+Commands and options also accept the Portuguese names (nes contrato, nes maturidade, --aplicar...).

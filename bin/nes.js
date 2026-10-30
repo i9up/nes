@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// NES: o método de A Nova Engenharia de Software aplicado ao repositório.
+// NES: o método de A Nova Engenharia de Software aplicado ao repositório. Sem terminal interativo (uma LLM rodando o
+// comando), perguntar fica nulo e os comandos entram no modo agente.
 import readline from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
 import { executar } from '../src/cli.js';

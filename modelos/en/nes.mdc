@@ -1,0 +1,7 @@
+---
+description: NES team and delivery flow. Use when implementing, reviewing or recording a change.
+alwaysApply: false
+---
+
+Follow the "NES team" section of `AGENTS.md` and the contract of each role in `.claude/agents/nes-*.md` (or of the
+agent adopted for the role, listed in `nes.json`). The method is in `docs/nes/METHODOLOGY.md`.

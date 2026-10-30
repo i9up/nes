@@ -1,0 +1,25 @@
+NES · A Nova Engenharia de Software aplicada ao repositório
+
+Uso: nes <comando> [opções]   (ou: npx @i9up/nes <comando>)
+
+  init                        monta o time NES: 4 perguntas, adota os agentes que já existem, põe OpenSpec e
+                              Ponytail no fluxo e configura o gate do Crivo. Mostra o plano; nunca sobrescreve.
+                                --sim             usa os padrões, sem perguntar (não instala nada)
+                                --com harness     inclui o harness-toolkit no fluxo
+                                --sem openspec,ponytail   deixa ferramentas de fora
+                                --refazer         refaz a entrevista mesmo com nes.json
+                              Modo agente (sem terminal; uma LLM conduz):
+                                --descricao "..." --aprovador "..." [--nivel M3] [--stack "..."] [--teste "pasta=comando"]
+                                --aplicar         grava (sem ela, só mostra o plano)
+  contrato [agente|arquivo]   confere as 5 seções do contrato de cada agente (cap. 8)
+                                --modelo <nome>   cria .claude/agents/<nome>.md com as 5 seções em branco
+                                --json            saída em JSON
+                                --estrito         sai com código 1 se algum contrato estiver incompleto (CI)
+  maturidade                  nível M0–M5 do projeto e de cada área, com o próximo critério a cumprir (cap. 21)
+                                --declarar chave="evidência"   registra o que só a equipe sabe (modo agente)
+                                --sem-perguntas   não pergunta; lista o que falta declarar
+                                --json            saída em JSON
+  agente                      protocolo para uma LLM (Claude Code, Codex, Cursor) conduzir o NES no projeto
+
+Opções comuns: --pasta <dir> (padrão: a pasta atual) · --idioma pt|en
+Os comandos e opções também aceitam os nomes em inglês (nes contract, nes maturity, --apply...).

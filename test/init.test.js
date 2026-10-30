@@ -190,7 +190,6 @@ test('init: acima do teto avisa; nes.json inválido e sem terminal recusam', asy
   const r = await init(projeto({ 'nes.json': JSON.stringify(config) }), sisFalso(), { sim: true, home: home() });
   assert.match(r.texto, /acima do teto/);
   assert.equal((await init(projeto({ 'nes.json': '{x' }), sisFalso(), { sim: true, home: home() })).codigo, 1);
-  assert.match((await init(projeto(), sisFalso(), { home: home() })).texto, /Sem terminal interativo/);
 });
 
 test('cli: init com --sim, --com e --sem', async () => {

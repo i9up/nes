@@ -1,6 +1,11 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { definirIdioma } from '../src/i18n.js';
+
+// Os testes rodam em português, qualquer que seja o idioma da máquina; os de inglês pedem o idioma explicitamente.
+process.env.NES_IDIOMA = 'pt';
+definirIdioma('pt');
 
 /** Pasta temporária com os arquivos dados ({ 'caminho/relativo': 'conteúdo' }). */
 export function projeto(arquivos = {}) {

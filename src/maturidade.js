@@ -5,19 +5,16 @@ import path from 'node:path';
 import { encontrarApps, lerConfig } from '@i9up/fengshui/src/medir.js';
 import { completo } from './contrato.js';
 import { PAPEIS, casaComPapel } from './papeis.js';
+import { ARQUIVOS_DOCS } from './modelo.js';
+import { t } from './i18n.js';
 
-export const NOMES = { M0: 'Sem IA', M1: 'Assistentes', M2: 'Agentes Especializados', M3: 'Times de Agentes', M4: 'Software Factory Inteligente', M5: 'Organização Cognitiva' };
-
-export const PERGUNTAS = {
-  producao: 'Algum agente com contrato completo roda em trabalho real? Onde se vê o resultado (PRs, log, painel)?',
-  coordenacao: 'A coordenação entre os agentes acontece sem alguém repassar o trabalho à mão? Como?',
-  abrangencia: 'Backlog, gate de qualidade e segurança valem além da primeira área do projeto? Em quais?',
-  metrica: 'Que métrica mostra a qualidade subindo pelo próprio uso, trimestre a trimestre?',
-};
+export const nomeNivel = (n) => t(`nivel.${n}`);
+export const pergunta = (chave) => t(`p.${chave}`);
+export const CHAVES_DECLARADAS = ['producao', 'coordenacao', 'abrangencia', 'metrica'];
 
 const INSTRUCOES_IA = ['CLAUDE.md', 'AGENTS.md', 'GEMINI.md', '.cursorrules', '.cursor/rules', '.github/copilot-instructions.md', '.claude'];
 const BACKLOG = ['openspec/changes', 'openspec/specs', 'tasks', '.specs', 'backlog'];
-const NEGATIVA = /^(n|n[ãa]o|no|nenhum[a]?|-)?$/i;
+const NEGATIVA = /^(n|n[ãa]o|no|none|nenhum[a]?|-)?$/i;
 
 const existe = (raiz, rel) => fs.existsSync(path.join(raiz, rel));
 const lerJson = (arquivo) => { try { return JSON.parse(fs.readFileSync(arquivo, 'utf8')); } catch { return {}; } };
@@ -30,10 +27,11 @@ export function temPoliticaDeSeguranca(raiz) {
   });
 }
 
-/** Trimestres distintos com registros datados (AAAA-MM-DD) no Capital Cognitivo. */
+/** Trimestres distintos com registros datados (AAAA-MM-DD) no Capital Cognitivo (o arquivo de qualquer idioma). */
 export function trimestresDoCapital(raiz) {
-  let texto = '';
-  try { texto = fs.readFileSync(path.join(raiz, 'docs', 'nes', 'CAPITAL-COGNITIVO.md'), 'utf8'); } catch { return 0; }
+  const texto = Object.values(ARQUIVOS_DOCS).map(({ capital }) => {
+    try { return fs.readFileSync(path.join(raiz, 'docs', 'nes', capital), 'utf8'); } catch { return ''; }
+  }).join('\n');
   const trimestres = new Set([...texto.matchAll(/\b(20\d\d)-(\d\d)-\d\d\b/g)].map(([, a, m]) => `${a}T${Math.ceil(Number(m) / 3)}`));
   return trimestres.size;
 }
@@ -44,7 +42,7 @@ const ehMaestro = (a) => a.nome === 'nes-maestro' || casaComPapel(PAPEIS[0], a);
 export function criterios(raiz, { agentes, config = {}, declarado = {} }) {
   const completos = agentes.filter((a) => completo(a.avaliacao));
   const verif = (ok, detalhe, dica) => ({ estado: ok ? 'ok' : 'falta', detalhe, dica });
-  const decl = (chave) => (declarado[chave] ? { estado: 'declarado', detalhe: declarado[chave], chave } : { estado: 'falta', detalhe: 'não declarado', chave, dica: 'responda em `nes maturidade` (modo interativo)' });
+  const decl = (chave) => (declarado[chave] ? { estado: 'declarado', detalhe: declarado[chave], chave } : { estado: 'falta', detalhe: t('m.naoDeclarado'), chave, dica: t('m.dicaDeclarar', { chave }) });
   const presentes = INSTRUCOES_IA.filter((f) => existe(raiz, f));
   const backlog = BACKLOG.filter((f) => existe(raiz, f));
   const gate = config.crivo?.comandos ?? [];
@@ -53,26 +51,26 @@ export function criterios(raiz, { agentes, config = {}, declarado = {} }) {
   const seguranca = temPoliticaDeSeguranca(raiz);
   return [
     { de: 'M0', para: 'M1', itens: [
-      { nome: 'parte da equipe usa IA regularmente', ...verif(presentes.length, presentes.join(', ') || 'nenhum arquivo de instruções para IA', 'crie CLAUDE.md ou AGENTS.md') },
+      { nome: t('m.usaIA'), ...verif(presentes.length, presentes.join(', ') || t('m.semInstrucoes'), t('m.dicaInstrucoes')) },
     ] },
     { de: 'M1', para: 'M2', itens: [
-      { nome: 'agente com contrato completo (5 seções)', ...verif(completos.length >= 1, `${completos.length} de ${agentes.length} agente(s)`, 'rode `nes contrato` e complete as seções') },
-      { nome: 'em uso real, com observabilidade mínima', ...decl('producao') },
+      { nome: t('m.contrato'), ...verif(completos.length >= 1, t('m.deAgentes', { c: completos.length, t: agentes.length }), t('m.dicaContrato')) },
+      { nome: t('m.producao'), ...decl('producao') },
     ] },
     { de: 'M2', para: 'M3', itens: [
-      { nome: 'dois ou mais especialistas com contrato', ...verif(completos.length >= 2, `${completos.length} com contrato completo`, 'complete o contrato de mais um especialista') },
-      { nome: 'orquestração formal (Maestro)', ...verif(maestro, maestro ? 'há um orquestrador' : 'nenhum orquestrador com contrato', 'rode `nes init` ou complete o contrato do orquestrador') },
-      { nome: 'coordenação sem repasse heroico', ...decl('coordenacao') },
+      { nome: t('m.dois'), ...verif(completos.length >= 2, t('m.comContrato', { c: completos.length }), t('m.dicaMaisUm')) },
+      { nome: t('m.orquestracao'), ...verif(maestro, t(maestro ? 'm.haOrquestrador' : 'm.semOrquestrador'), t('m.dicaOrquestrador')) },
+      { nome: t('m.coordenacao'), ...decl('coordenacao') },
     ] },
     { de: 'M3', para: 'M4', itens: [
-      { nome: 'backlog estruturado', ...verif(backlog.length, backlog.join(', ') || 'sem openspec/ nem tasks/', 'use o OpenSpec (`openspec init`)') },
-      { nome: 'gate de qualidade do Crivo', ...verif(gate.length, gate.map((g) => g.comando).join('; ') || 'sem comandos em nes.json', 'rode `nes init` para configurar o gate') },
-      { nome: 'segurança formal', ...verif(seguranca, seguranca ? 'hooks PreToolUse ou permissions.deny em .claude/' : 'nenhuma regra de negação nem hook antes das ferramentas', 'configure permissions.deny ou o harness-toolkit') },
-      { nome: 'aplicado além da primeira área', ...decl('abrangencia') },
+      { nome: t('m.backlog'), ...verif(backlog.length, backlog.join(', ') || t('m.semBacklog'), t('m.dicaBacklog')) },
+      { nome: t('m.gate'), ...verif(gate.length, gate.map((g) => g.comando).join('; ') || t('m.semGate'), t('m.dicaGate')) },
+      { nome: t('m.seguranca'), ...verif(seguranca, t(seguranca ? 'm.comSeguranca' : 'm.semSeguranca'), t('m.dicaSeguranca')) },
+      { nome: t('m.abrangencia'), ...decl('abrangencia') },
     ] },
     { de: 'M4', para: 'M5', itens: [
-      { nome: 'Capital Cognitivo com histórico de 2+ trimestres', ...verif(trimestres >= 2, `${trimestres} trimestre(s) com registro`, 'o Cronista registra em docs/nes/CAPITAL-COGNITIVO.md') },
-      { nome: 'qualidade melhora pelo uso, com métrica', ...decl('metrica') },
+      { nome: t('m.capital'), ...verif(trimestres >= 2, t('m.trimestres', { n: trimestres }), t('m.dicaCapital')) },
+      { nome: t('m.metrica'), ...decl('metrica') },
     ] },
   ];
 }

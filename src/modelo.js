@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { idioma } from './i18n.js';
 
 export const PASTA_MODELOS = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'modelos');
 
@@ -16,6 +17,13 @@ export function renderizar(texto, vars) {
   return saida.replace(/\n{3,}/g, '\n\n');
 }
 
+/** Modelo no idioma atual (modelos/pt/... ou modelos/en/...). */
 export function lerModelo(relativo) {
-  return fs.readFileSync(path.join(PASTA_MODELOS, relativo), 'utf8');
+  return fs.readFileSync(path.join(PASTA_MODELOS, idioma(), relativo), 'utf8');
 }
+
+/** Nomes dos arquivos de docs/nes/ em cada idioma. */
+export const ARQUIVOS_DOCS = {
+  pt: { metodologia: 'METODOLOGIA.md', capital: 'CAPITAL-COGNITIVO.md' },
+  en: { metodologia: 'METHODOLOGY.md', capital: 'COGNITIVE-CAPITAL.md' },
+};

@@ -1,7 +1,7 @@
 {
   "name": "@i9up/nes",
-  "version": "0.1.0",
-  "description": "Método NES (A Nova Engenharia de Software) aplicado ao repositório: time de agentes com contrato, maturidade M0–M5 com critérios objetivos e OpenSpec/Ponytail no fluxo.",
+  "version": "0.2.0",
+  "description": "NES method (A Nova Engenharia de Software) for your repository: agent team with contracts, M0-M5 maturity with objective criteria, OpenSpec/Ponytail in the flow and an agent mode for LLMs. Portuguese and English.",
   "type": "module",
   "bin": {
     "nes": "bin/nes.js"
@@ -10,7 +10,8 @@
     "bin",
     "src",
     "modelos",
-    "README.md"
+    "README.md",
+    "README.en.md"
   ],
   "engines": {
     "node": ">=20"

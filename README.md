@@ -1,17 +1,38 @@
 # NES · A Nova Engenharia de Software, aplicada ao repositório
 
-[![npm](https://img.shields.io/npm/v/@i9up/nes)](https://www.npmjs.com/package/@i9up/nes) · Node 20+ · MIT
+[![npm](https://img.shields.io/npm/v/@i9up/nes)](https://www.npmjs.com/package/@i9up/nes) · Node 20+ · MIT · [English](README.en.md)
 
 Quase todo o discurso sobre IA no desenvolvimento fala de ferramentas; quase nada fala de **organização**. O método
 NES, do livro *A Nova Engenharia de Software* (Alessandro Medeiros, Coleção NES, Vol. 1), organiza pessoas, agentes
-especializados e conhecimento num sistema coordenado. Esta biblioteca aplica o método ao seu repositório, em qualquer
-stack.
+especializados e conhecimento num sistema coordenado. Esta biblioteca aplica o método ao seu repositório. Ela não
+depende de linguagem: lê o que o projeto já tem (stack, agentes, backlog) e se organiza a partir disso.
 
 ```bash
 npx @i9up/nes init          # monta o time de agentes, com contrato, e põe OpenSpec e Ponytail no fluxo
 npx @i9up/nes contrato      # confere as 5 seções do contrato de cada agente
 npx @i9up/nes maturidade    # M0–M5 do projeto e de cada área, com o próximo critério a cumprir
+npx @i9up/nes agente        # protocolo para uma LLM conduzir tudo isso no projeto
 ```
+
+Português ou inglês: o idioma vem do sistema, do `nes.json` ou de `--idioma pt|en`. Os comandos também aceitam os
+nomes em inglês (`nes contract`, `nes maturity`, `--apply`).
+
+## Com um agente de IA
+
+Peça ao seu agente (Claude Code, Codex, Cursor): *"rode `npx @i9up/nes agente` e siga o protocolo"*. Sem terminal
+interativo, a `nes` entra no modo agente:
+
+1. A LLM lê o repositório e responde o que ele prova: o que o projeto faz, a stack, o comando de teste de cada pasta.
+2. O `init` devolve o que só o humano sabe (quem aprova o que for escalado, o nível para começar). A LLM pergunta a
+   você, e não inventa (NES-002).
+3. Ela roda `nes init --descricao "..." --aprovador "..." --teste "pasta=comando"` e mostra o plano. Nada é gravado
+   sem `--aplicar`, que ela só usa com o seu OK. Instaladores, também só com a sua permissão.
+4. Completa os contratos dos agentes que já existiam até 5/5, confirmando com você o nível de autonomia e as metas.
+5. Roda `nes maturidade`; o que o repositório não prova vira pergunta para você, registrada com
+   `--declarar chave="evidência"`.
+
+O objetivo não é 100% de autonomia: é a maior autonomia possível **dentro de perímetros explícitos**, que crescem
+com as métricas. Decisão sem regra escrita e merge em produção continuam com uma pessoa.
 
 ## Os 3 princípios
 
@@ -35,8 +56,9 @@ time do tamanho certo:
   `.claude/agents/`, eles assumem os papéis. Só o que falta vira `nes-<papel>.md`.
 - **Contrato em todo papel gerado.** Cada agente sai com as 5 seções do cap. 8 e ferramentas mínimas, e passa 5/5 no
   `nes contrato`.
-- **Gate do Crivo pela stack.** O `init` detecta a stack de cada pasta (node, python, go, .NET, Java, Rust) e configura
-  o comando de teste. Em Delphi, ele pergunta o runner do DUnitX.
+- **Gate do Crivo pela stack.** O `init` detecta a stack de cada pasta (node, python, go, .NET, Java, Rust, Delphi) e
+  configura o comando de teste. Quando não há comando padrão (o runner do DUnitX, uma stack que ele não conhece), você
+  informa com `--teste "pasta=comando"`.
 - **Dieta de Contexto.** O time inteiro custa no máximo ~600 tokens fixos por sessão (fica em ~240 num projeto novo).
   O método fica em `docs/nes/`, lido só quando precisa.
 - **Nunca sobrescreve.** O `init` mostra o plano e pergunta antes de gravar. Rodar de novo só cria o que falta.
@@ -83,8 +105,8 @@ repositório, **◐ declarado** pela equipe (a `nes` pergunta só o que o reposi
 
 O [`@i9up/fengshui`](https://github.com/i9up/fengshui) é o NES-001 em forma de ferramenta: organiza o contexto que os
 agentes carregam (a Dieta de Contexto). A `nes` usa o fengshui por dentro: o `init` mede o contexto fixo antes e
-depois. Na prática, **rode só a `nes`**. Num projeto já carregado de instruções, vale passar antes pelo
-`npx @i9up/fengshui diagnostico`.
+depois. Na prática, **rode só a `nes`**. O fengshui também funciona sozinho, sem a `nes`; num projeto já carregado de
+instruções, vale passar antes pelo `npx @i9up/fengshui diagnostico`.
 
 ## Caso real
 
