@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { contrato, modeloDeContrato } from './comando-contrato.js';
+import { maturidade } from './comando-maturidade.js';
 
 export const AJUDA = `NES · A Nova Engenharia de Software aplicada ao repositório
 
@@ -9,6 +10,9 @@ Uso: nes <comando> [opções]   (ou: npx @i9up/nes <comando>)
                                 --modelo <nome>   cria .claude/agents/<nome>.md com as 5 seções em branco
                                 --json            saída em JSON
                                 --estrito         sai com código 1 se algum contrato estiver incompleto (CI)
+  maturidade                  nível M0–M5 do projeto e de cada área, com o próximo critério a cumprir (cap. 21)
+                                --sem-perguntas   não pergunta o que o repositório não prova
+                                --json            saída em JSON
 
 Opção comum: --pasta <dir>  (padrão: a pasta atual)`;
 
@@ -26,7 +30,7 @@ export function posicional(args, comValor = []) {
   return '';
 }
 
-export async function executar(args, { cwd = process.cwd() } = {}) {
+export async function executar(args, { cwd = process.cwd(), perguntar = null } = {}) {
   const comando = args[0] ?? 'ajuda';
   const raiz = path.resolve(cwd, opcao(args, '--pasta', '.'));
   switch (comando) {
@@ -36,6 +40,8 @@ export async function executar(args, { cwd = process.cwd() } = {}) {
       const r = contrato(raiz, { alvo: posicional(args, ['--pasta', '--modelo']), json: args.includes('--json') });
       return { texto: r.texto, codigo: r.codigo || (args.includes('--estrito') && r.completos < r.total ? 1 : 0) };
     }
+    case 'maturidade':
+      return maturidade(raiz, { json: args.includes('--json'), perguntar: args.includes('--sem-perguntas') ? null : perguntar });
     case 'ajuda':
     case '--help':
     case '-h':
